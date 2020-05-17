@@ -1,16 +1,45 @@
 import sys
+import numpy as np
+import pandas as pd
+from sqlalchemy import create_engine
+
 
 
 def load_data(messages_filepath, categories_filepath):
-    pass
+    """Load message file and category file, return merged DataFrame"""
+    messages = pd.read_csv(messages_filepath)
+    categories = pd.read_csv(categories_filepath)
+
+    return messages.merge(categories)
 
 
 def clean_data(df):
-    pass
+    """Return cleaned DataFrame"""
+    # create a dataframe of the 36 individual category columns
+    categories = df['categories'].str.split(';', expand=True)
 
+    # rename the columns of `categories`
+    row = categories.iloc[0,:]
+    category_colnames = row.apply(lambda x: x[0:-2])
+    categories.columns = category_colnames
+
+    # convert category values to just numbers 0 or 1
+    for column in categories:
+        categories[column] = categories[column].str[-1]
+        categories[column] = categories[column].astype(int)
+    
+    # replace categories column in df with new category columns
+    df.drop(['categories'], axis=1, inplace=True)
+    df = pd.concat([df, categories], axis=1)
+
+    # remove duplicates
+    df.drop_duplicates(inplace=True)
+
+    return df
 
 def save_data(df, database_filename):
-    pass  
+    engine = create_engine('sqlite:///' + database_filename + '.db')
+    df.to_sql('Messages', engine, index=False)
 
 
 def main():
