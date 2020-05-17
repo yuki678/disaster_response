@@ -56,7 +56,7 @@ def build_model():
     """Returns a ML model"""
     parameters_short = {
         'clf__estimator__n_estimators': [10, 20, 50],
-        'clf__estimator__max_depth': [2, 5, None],
+        'clf__estimator__max_depth': [2, 5],
         'clf__estimator__min_samples_leaf':[1, 5, 10],
         'clf__estimator__criterion': ['gini', 'entropy'],
         'vect__ngram_range': [(1, 1), (1, 2)]
